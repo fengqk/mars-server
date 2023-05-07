@@ -1,0 +1,25 @@
+# 网关服
+gate:
+  ip: 127.0.0.1
+  port: 8200
+
+# 游戏服
+game:
+  ip: 127.0.0.1
+  port: 8300
+
+# Mysql数据库
+mysql:
+  ip: 127.0.0.1
+  port: 3306
+  name: mars
+  user: root
+  password: 123456
+  maxIdleConns: 500
+  maxOpenConns: 1000
+
+# Redis数据库
+redis:
+  ip: 127.0.0.1
+  port: 6379
+  password: 123456
