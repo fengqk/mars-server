@@ -1,0 +1,67 @@
+syntax = "proto3";
+import "message.proto";
+
+option go_package = "/;message";
+package message;
+
+message Point3F{
+    float  X = 1;
+    float  Y = 2;
+    float  Z = 3;
+}
+
+message C_Z_Move{
+    IPacket PacketHead = 1;
+
+    message Move{
+        message Normal{
+	       Point3F Pos = 1;
+           float  Yaw = 2;
+	       float  Duration = 3;
+        }
+
+        int32  Mode = 1;
+        Normal normal = 2;
+    }
+
+    Move move = 2;
+}
+
+//skill
+message C_Z_Skill{
+    IPacket PacketHead = 1;
+    int32 SkillId = 2;
+    int64 TargetId = 3;
+}
+
+message Z_C_LoginMap{
+    IPacket PacketHead = 1;
+    int64 Id = 2;
+    Point3F Pos = 3;
+    float Rotation = 4;
+}
+
+message Z_C_ENTITY{
+    IPacket PacketHead = 1;
+    message Entity{
+
+        message MoveMask{
+            Point3F Pos = 1;
+            float Rotation = 2;
+            bool ForceUpdateFlag = 3;
+        }
+
+        message StatsMask{
+            int32 HP = 1;
+            int32 MP = 2;
+            int32 MaxHP = 3;
+            int32 MaxMP = 4;
+        }
+
+        int64 Id = 1;
+        MoveMask Move = 2;
+        StatsMask Stats = 3;
+    }
+    repeated Entity EntityInfo = 2;
+}
+

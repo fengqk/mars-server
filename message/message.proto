@@ -1,0 +1,40 @@
+syntax = "proto3";
+option go_package = "/;message";
+
+package message;
+
+//服务器类型
+enum SERVICE{
+    NONE= 0;
+    CLIENT=1;
+    GATE= 2;
+    GAME=3;
+    ZONE=4;
+    DB=5;
+    NUM=6;
+};
+
+enum CHAT{
+    MSG_TYPE_WORLD= 0;
+    MSG_TYPE_PRIVATE= 1;
+    MSG_TYPE_ORG= 2;
+    MSG_TYPE_COUNT= 3;
+};
+
+message PlayerData{
+    int64 PlayerID = 1;
+    string PlayerName = 2;
+    int32 PlayerGold = 3;
+}
+
+//客户端包头
+message IPacket{
+    int32  Stx = 1;
+    SERVICE  DestServerType = 2;
+    int32  Ckx = 3;
+    int64  Id = 4;
+}
+
+//心跳包
+message HeardPacket{ 
+}
