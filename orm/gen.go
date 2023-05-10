@@ -28,8 +28,8 @@ var (
 		"Player": fileInfo{
 			obj: PlayerData{},
 			moduleList: []moduleInfo{
-				moduleInfo{"Player", "./../../mars-server/game/player/PlayerData.go", "game"},
-				moduleInfo{"Player", "./../../mars-server/db/PlayerData.go", "db"},
+				moduleInfo{"Player", "../../game/player/player_data.go", "game"},
+				moduleInfo{"Player", "../../db/player_data.go", "db"},
 			},
 			dbKey:     `PlayerId`,
 			dbKeyType: `int64`,
@@ -40,7 +40,7 @@ var (
 	FILE_GENERATE_HEAD_MAP = map[string]string{
 		"game": `package player
 
-import(
+import (
 	"github.com/fengqk/mars-base/base"
 	"github.com/fengqk/mars-base/cluster"
 	"github.com/fengqk/mars-base/rpc"
@@ -51,8 +51,9 @@ import(
 
 		"db": `package db
 
-import(
+import (
 	"context"
+	
 	"github.com/fengqk/mars-base/base"
 	"github.com/fengqk/mars-base/db"
 	"github.com/fengqk/mars-server/orm"
@@ -82,11 +83,11 @@ func (this *{ClassName}) __Save{MemberType}DB(){
 		"db": []string{
 			`
 func (this *{ClassName}) __Load{MemberType}DB({DbKeyName} {DbKeyTypeName}) error{
-    data := &model.{MemberType}{{DbKeyName}:{DbKeyName}}
-    rows, err := orm.DB.Query(orm.LoadSql(data, orm.WithWhere(data)))
-    rs, err := orm.Query(rows, err)
+    data := &orm.{MemberType}{{DbKeyName}:{DbKeyName}}
+    rows, err := db.DB.Query(db.LoadSql(data, db.WithWhere(data)))
+    rs, err := db.Query(rows, err)
     if err == nil && rs.Next() {
-        orm.LoadObjSql(&this.{MemberName}, rs.Row())
+        db.LoadObjSql(&this.{MemberName}, rs.Row())
     }
 	return err
 }
@@ -95,18 +96,18 @@ func (this *{ClassName}) __Load{MemberType}DB({DbKeyName} {DbKeyTypeName}) error
 
 func (this *{ClassName}) __Save{MemberType}DB(){
 	if this.{MemberName}.Dirty{
-    	orm.DB.Exec(orm.SaveSql(this.{MemberName}))
+    	db.DB.Exec(db.SaveSql(this.{MemberName}))
 		this.{MemberName}.Dirty = false
 	}
 }
 
-func (this *{ClassName}) __Save{MemberType}(data model.{MemberType}){
+func (this *{ClassName}) __Save{MemberType}(data orm.{MemberType}){
     this.{MemberName} = data
 	this.{MemberName}.Dirty = true
     base.LOG.Printf("玩家[%d] Save{MemberType}", this.{MemberType}.{DbKeyName})
 }
 
-func (this *{ClassName}Mgr) Save{MemberType}(ctx context.Context, playerId int64, data model.{MemberType}){
+func (this *{ClassName}Mgr) Save{MemberType}(ctx context.Context, playerId int64, data orm.{MemberType}){
     player := this.GetPlayer(playerId)
 	if player != nil{
         player.__Save{MemberType}(data)
