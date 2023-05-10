@@ -43,5 +43,4 @@ func Init() {
 }
 
 func Exit() {
-
 }

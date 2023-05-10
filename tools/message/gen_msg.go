@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	PATH               = "../message"
+	PATH               = "../../message"
 	PROTO [2][1]string = [2][1]string{
 		{
 			"protoc.exe --plugin=protoc-gen-go=protoc-gen-go.exe  --go_out=%s  --proto_path=%s	",
@@ -52,7 +52,7 @@ func main() {
 	//生成bat文件
 	{
 		stream := bytes.NewBuffer([]byte{})
-		file, err := os.Create("gen.bat")
+		file, err := os.Create("gen_msg.bat")
 		if err == nil {
 			for _, v := range PROTO[0] {
 				stream.WriteString(fmt.Sprintf(v, PATH, PATH))
@@ -65,7 +65,7 @@ func main() {
 	}
 	{
 		stream := bytes.NewBuffer([]byte{})
-		file, err := os.Create("gen.sh")
+		file, err := os.Create("gen_msg.sh")
 		if err == nil {
 			for _, v := range PROTO[1] {
 				stream.WriteString(fmt.Sprintf(v, PATH, PATH))
