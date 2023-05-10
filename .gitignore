@@ -13,3 +13,6 @@
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
+bin/log/db_20230510.log
+bin/log/game_20230510.log
+bin/log/gate_20230510.log
