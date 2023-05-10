@@ -3,7 +3,7 @@ module github.com/fengqk/mars-server
 go 1.20
 
 require (
-	github.com/fengqk/mars-base v0.0.7
+	github.com/fengqk/mars-base v0.0.8
 	github.com/golang/protobuf v1.5.3
 	google.golang.org/protobuf v1.30.0
 )

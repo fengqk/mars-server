@@ -5,7 +5,6 @@ import (
 	"github.com/fengqk/mars-base/base"
 	"github.com/fengqk/mars-base/network"
 	"github.com/fengqk/mars-base/rpc"
-	"github.com/fengqk/mars-server/gate/player"
 	"github.com/fengqk/mars-server/message"
 )
 

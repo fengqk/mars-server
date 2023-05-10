@@ -7,7 +7,6 @@ import (
 	"github.com/fengqk/mars-base/common"
 	"github.com/fengqk/mars-base/network"
 	"github.com/fengqk/mars-base/rpc"
-	"github.com/fengqk/mars-server/gate/player"
 )
 
 type (
@@ -15,14 +14,14 @@ type (
 		Init() bool
 		GetServer() *network.ServerSocket
 		GetCluster() *cluster.Cluster
-		GetPlayerMgr() *player.PlayerMgr
+		GetPlayerMgr() *PlayerMgr
 		OnServerStart()
 	}
 
 	ServerMgr struct {
 		service   *network.ServerSocket
 		isInited  bool
-		playerMgr *player.PlayerMgr
+		playerMgr *PlayerMgr
 		cluster   *cluster.Cluster
 	}
 
@@ -73,7 +72,7 @@ func (s *ServerMgr) Init() bool {
 	s.cluster.BindPacketFunc(actor.MGR.PacketFunc)
 	s.cluster.BindPacketFunc(DispatchPacket)
 
-	s.playerMgr = new(player.PlayerMgr)
+	s.playerMgr = new(PlayerMgr)
 	s.playerMgr.Init()
 	return false
 
@@ -87,7 +86,7 @@ func (s *ServerMgr) GetCluster() *cluster.Cluster {
 	return s.cluster
 }
 
-func (s *ServerMgr) GetPlayerMgr() *player.PlayerMgr {
+func (s *ServerMgr) GetPlayerMgr() *PlayerMgr {
 	return s.playerMgr
 }
 
