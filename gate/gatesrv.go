@@ -20,7 +20,6 @@ type (
 
 	ServerMgr struct {
 		service   *network.ServerSocket
-		isInited  bool
 		playerMgr *PlayerMgr
 		cluster   *cluster.Cluster
 	}
@@ -40,10 +39,6 @@ var (
 )
 
 func (s *ServerMgr) Init() bool {
-	if s.isInited {
-		return true
-	}
-
 	base.ReadConf("mars.yaml", &CONF)
 
 	ShowMessage := func() {
@@ -74,7 +69,8 @@ func (s *ServerMgr) Init() bool {
 
 	s.playerMgr = new(PlayerMgr)
 	s.playerMgr.Init()
-	return false
+
+	return true
 
 }
 

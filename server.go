@@ -7,17 +7,11 @@ import (
 	"syscall"
 
 	"github.com/fengqk/mars-base/base"
+	"github.com/fengqk/mars-server/db"
+	"github.com/fengqk/mars-server/game"
 	"github.com/fengqk/mars-server/gate"
 	"github.com/fengqk/mars-server/message"
 )
-
-func Init() {
-	message.Init()
-}
-
-func Exit() {
-
-}
 
 func main() {
 	args := os.Args
@@ -27,6 +21,10 @@ func main() {
 	switch base.SEVERNAME {
 	case "gate":
 		gate.SERVER.Init()
+	case "game":
+		game.SERVER.Init()
+	case "db":
+		db.SERVER.Init()
 	}
 
 	Init()
@@ -38,4 +36,12 @@ func main() {
 	fmt.Printf("server %s exit,signal: %v", args[1], s)
 
 	Exit()
+}
+
+func Init() {
+	message.Init()
+}
+
+func Exit() {
+
 }
