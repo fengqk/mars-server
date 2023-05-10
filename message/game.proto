@@ -2,7 +2,6 @@ syntax = "proto3";
 import "message.proto";
 
 option go_package = "/;message";
-package message;
 
 message Point3F{
     float  X = 1;

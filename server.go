@@ -8,10 +8,11 @@ import (
 
 	"github.com/fengqk/mars-base/base"
 	"github.com/fengqk/mars-server/gate"
+	"github.com/fengqk/mars-server/message"
 )
 
 func Init() {
-	common.Init()
+	message.Init()
 }
 
 func Exit() {

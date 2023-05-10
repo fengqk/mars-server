@@ -2,7 +2,6 @@ syntax = "proto3";
 import "message.proto";
 
 option go_package = "/;message";
-package message;
 
 //登录账号
 message LoginAccountRequest{

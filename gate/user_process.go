@@ -19,7 +19,7 @@ type (
 		actor.IActor
 
 		CheckClientEx(uint32, string, rpc.RpcHead) bool
-		CheckClient(uint32, string, rpc.RpcHead) *player.Player
+		CheckClient(uint32, string, rpc.RpcHead) *Player
 		SwitchSendToGame(uint32, string, rpc.RpcHead, []byte)
 		SwitchSendToZone(uint32, string, rpc.RpcHead, []byte)
 
@@ -101,7 +101,7 @@ func (u *UserProcess) PacketFunc(pkg rpc.Packet) bool {
 	return true
 }
 
-func (u *UserProcess) CheckClient(sockId uint32, packetName string, head rpc.RpcHead) *player.Player {
+func (u *UserProcess) CheckClient(sockId uint32, packetName string, head rpc.RpcHead) *Player {
 	pPlayer := SERVER.GetPlayerMgr().GetPlayer(sockId)
 	if pPlayer != nil && (pPlayer.PlayerId <= 0 || pPlayer.PlayerId != head.Id) {
 		base.LOG.Fatalf("Old socket communication or viciousness[%d].", sockId)

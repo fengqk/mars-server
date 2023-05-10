@@ -102,7 +102,7 @@ func init() {
 // 统计crc对应string
 func initCrcNames() {
 	protoFiles := []protoreflect.MessageDescriptors{}
-	protoFiles = append(protoFiles, File_message_message_proto.Messages())
+	protoFiles = append(protoFiles, File_message_proto.Messages())
 	protoFiles = append(protoFiles, File_client_proto.Messages())
 	protoFiles = append(protoFiles, File_game_proto.Messages())
 	for _, v := range protoFiles {
@@ -114,7 +114,7 @@ func initCrcNames() {
 	}
 }
 
-// 网关防火墙
+// 服务器消息
 func Init() {
 	initCrcNames()
 	//注册消息
@@ -128,7 +128,7 @@ func Init() {
 	RegisterPacket(&C_Z_Skill{}, "zone<-Map.C_Z_Skill")
 }
 
-// client消息回调
+// 客户端消息
 func InitClient() {
 	initCrcNames()
 	//注册消息
