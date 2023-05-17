@@ -8,53 +8,84 @@ import (
 	"net/http"
 	"os"
 	"runtime"
+	"strconv"
+	"time"
 
+	"github.com/beevik/etree"
 	"github.com/gorilla/websocket"
 )
 
 var g_tcpAddress string
 var upgrader = websocket.Upgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
 	CheckOrigin: func(r *http.Request) bool {
 		return true
 	},
 }
 
-func copyWebscoket2TcpWorker(dst net.Conn, src *websocket.Conn, doneCh chan<- bool) {
+func forwardWeb(dst net.Conn, src *websocket.Conn) {
 	defer func() {
-		doneCh <- true
+		if err := recover(); err != nil {
+			log.Printf("%s: forward from web failed: %s", time.Now().Format(time.Stamp), err)
+		}
+		if src != nil {
+			src.Close()
+		}
+		if dst != nil {
+			dst.Close()
+		}
 	}()
 
 	for {
-		_, message, err := src.ReadMessage()
-		if err != nil {
-			log.Fatalln("copyWebscoket2TcpWorker read message failed")
+		if (src == nil) || (dst == nil) {
+			log.Printf("forwardWeb conn is null")
 			return
 		}
 
-		_, err = dst.Write([]byte(message))
+		_, message, err := src.ReadMessage()
 		if err != nil {
-			log.Fatalln("copyWebscoket2TcpWorker write message failed")
+			log.Printf("forwardWeb read message failed")
+			return
+		}
+
+		_, err = dst.Write(message)
+		if err != nil {
+			log.Printf("forwardWeb write message failed")
 			return
 		}
 	}
 }
 
-func copyTcp2WebsocketWorker(dst *websocket.Conn, src net.Conn, doneCh chan<- bool) {
+func forwardTcp(dst *websocket.Conn, src net.Conn) {
 	defer func() {
-		doneCh <- true
+		if err := recover(); err != nil {
+			log.Printf("%s: forward from tcp failed: %s", time.Now().Format(time.Stamp), err)
+		}
+		if src != nil {
+			src.Close()
+		}
+		if dst != nil {
+			dst.Close()
+		}
 	}()
 
 	buff := make([]byte, 1024)
 	for {
-		n, err := src.Read(buff)
-		if err != nil {
-			log.Fatalln("copyTcp2WebsocketWorker read message failed")
+		if (src == nil) || (dst == nil) {
+			log.Printf("forwardTcp conn is null")
 			return
 		}
 
-		err = dst.WriteMessage(websocket.BinaryMessage, buff[:n])
+		n, err := src.Read(buff[0:])
 		if err != nil {
-			log.Fatalln("copyTcp2WebsocketWorker write message failed")
+			log.Printf("forwardTcp read message failed")
+			return
+		}
+
+		err = dst.WriteMessage(websocket.BinaryMessage, buff[0:n])
+		if err != nil {
+			log.Printf("forwardTcp write message failed")
 			return
 		}
 	}
@@ -63,33 +94,26 @@ func copyTcp2WebsocketWorker(dst *websocket.Conn, src net.Conn, doneCh chan<- bo
 func handler(w http.ResponseWriter, r *http.Request) {
 	ws, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Fatalln("upgrade failed")
+		log.Printf("upgrade failed")
 		return
 	}
 
 	conn, err := net.Dial("tcp", g_tcpAddress)
 	if err != nil {
-		log.Fatalln("conn failed")
+		log.Printf("conn failed")
 		return
 	}
 
-	doneCh := make(chan bool)
-
-	go copyWebscoket2TcpWorker(conn, ws, doneCh)
-	go copyTcp2WebsocketWorker(ws, conn, doneCh)
-
-	<-doneCh
-	conn.Close()
-	ws.Close()
-	<-doneCh
+	go forwardWeb(conn, ws)
+	go forwardTcp(ws, conn)
 }
 
-func usage() {
+func argsUsage() {
 	fmt.Fprintf(os.Stderr, "Usage: %s -host=ip:port -port=listen_port [optional]\noption:\n", os.Args[1])
 	flag.PrintDefaults()
 }
 
-func parseArgs() (string, int, string, string, error) {
+func argsParse() (string, int, string, string, error) {
 	var host string
 	var port int
 	var certFile string
@@ -99,7 +123,7 @@ func parseArgs() (string, int, string, string, error) {
 	flag.IntVar(&port, "port", 0, "websocket listen port")
 	flag.StringVar(&certFile, "tlscert", "", "TLS cert file path")
 	flag.StringVar(&keyFile, "tlskey", "", "TLS key file path")
-	flag.Usage = usage
+	flag.Usage = argsUsage
 	flag.Parse()
 
 	if host == "" || port == 0 {
@@ -109,19 +133,64 @@ func parseArgs() (string, int, string, string, error) {
 	return host, port, certFile, keyFile, nil
 }
 
+func xmlsParse() (string, int, string, string, error) {
+	var host string
+	var port int
+	var certFile string
+	var keyFile string
+
+	doc := etree.NewDocument()
+	if err := doc.ReadFromFile("./srvconf.xml"); err != nil {
+		log.Printf("open srvconf failed")
+		return host, port, certFile, keyFile, fmt.Errorf("open srvconf failed")
+	}
+
+	root := doc.SelectElement("srvconf")
+	connElement := root.FindElement("./conn")
+	connAddr := connElement.FindElement("./addr1").Text()
+	connPort := connElement.FindElement("./export1").Text()
+	host = connAddr + ":" + connPort
+
+	wsElement := root.FindElement("./websocket")
+	port, _ = strconv.Atoi(wsElement.FindElement("port").Text())
+	certFile = wsElement.FindElement("certfile").Text()
+	keyFile = wsElement.FindElement("keyfile").Text()
+
+	return host, port, certFile, keyFile, nil
+}
+
+type LogFile struct {
+	fp string
+}
+
+func (lf *LogFile) Write(p []byte) (int, error) {
+	f, err := os.OpenFile(lf.fp, os.O_CREATE|os.O_APPEND, 0x666)
+	defer f.Close()
+
+	if err != nil {
+		return -1, err
+	}
+	return f.Write(p)
+}
+
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	tcpAddress, port, certFile, keyFile, err := parseArgs()
+	//lf := LogFile{fp: "log.txt"}
+	//log.SetOutput(&lf)
+
+	//tcpAddress, port, certFile, keyFile, err := argsParse()
+	tcpAddress, port, certFile, keyFile, err := xmlsParse()
 	if err != nil {
-		usage()
+		argsUsage()
 		log.Fatalln(err)
-		os.Exit(1)
 	}
 
 	g_tcpAddress = tcpAddress
 	portString := fmt.Sprintf(":%d", port)
-	log.Printf("start server on port: %d,game server: %s", port, tcpAddress)
+	log.Printf("start server on port: %d, game server: %s", port, tcpAddress)
+
+	http.HandleFunc("/", handler)
 
 	if certFile != "" && keyFile != "" {
 		err = http.ListenAndServeTLS(portString, certFile, keyFile, nil)
@@ -131,6 +200,5 @@ func main() {
 
 	if err != nil {
 		log.Fatalln(err)
-		os.Exit(1)
 	}
 }

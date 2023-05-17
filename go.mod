@@ -3,8 +3,10 @@ module github.com/fengqk/mars-server
 go 1.20
 
 require (
+	github.com/beevik/etree v1.2.0
 	github.com/fengqk/mars-base v0.1.1
 	github.com/golang/protobuf v1.5.3
+	github.com/gorilla/websocket v1.5.0
 	google.golang.org/protobuf v1.30.0
 )
 
@@ -31,7 +33,6 @@ require (
 require (
 	github.com/go-sql-driver/mysql v1.7.1 // indirect
 	github.com/gomodule/redigo v1.8.9 // indirect
-	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.4 // indirect
 	github.com/klauspost/reedsolomon v1.11.7 // indirect
 	github.com/nats-io/nats.go v1.25.0 // indirect
