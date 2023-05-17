@@ -19,7 +19,7 @@ db:
 
 # Mysql数据库
 mysql:
-  ip: 127.0.0.1
+  ip: 192.168.12.240
   port: 3306
   name: mars
   user: root
@@ -29,28 +29,28 @@ mysql:
 
 # Redis数据库
 redis:
-  ip: 127.0.0.1
+  ip: 192.168.12.240
   port: 6379
   password: 123456
 
 # 服务发现
 etcd:
   endpoints:
-    - http://127.0.0.1:2379
+    - http://192.168.12.240:2379
 
 # raft同步
 raft:
   endpoints:
-    - http://127.0.0.1:2379
+    - http://192.168.12.240:2379
     
 # UUID生成
 snowflake:
   endpoints:
-    - http://127.0.0.1:2379
+    - http://192.168.12.240:2379
 
 # nats
 nats:
-  endpoints: 127.0.0.1:4222
+  endpoints: 192.168.12.240:4222
 
 # stub
 stub:

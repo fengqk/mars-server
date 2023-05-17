@@ -31,6 +31,7 @@ require (
 require (
 	github.com/go-sql-driver/mysql v1.7.1 // indirect
 	github.com/gomodule/redigo v1.8.9 // indirect
+	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.4 // indirect
 	github.com/klauspost/reedsolomon v1.11.7 // indirect
 	github.com/nats-io/nats.go v1.25.0 // indirect
